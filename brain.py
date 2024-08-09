@@ -66,52 +66,30 @@ class CheckPattern:
             game_weeks = check_if_last_result_equal_input(self.browser, game_weeks=game_weeks,
                                                         week_to_check=latest_week,time_delay=30)
             
-            home_team_names=self.browser.find_elements(By.CSS_SELECTOR,'[data-testid="results-home-team"]')[:9]
-            for name in home_team_names:
-                if games_selected.get(name.text)!=None:
-                    parent_element=name.find_element(By.XPATH,'..')
+            home_team_names=self.browser.find_elements(By.CSS_SELECTOR,'[data-testid="results-home-team"]')[:36]
+            away_team_names=self.browser.find_elements(By.CSS_SELECTOR,'[data-testid="results-away-team"]')[:36]
+            for n in range(len(home_team_names)):
+                current_match=f"{home_team_names[n].text} - {away_team_names[n].text}"
+                if games_selected.get(current_match)!=None:
+                    parent_element=home_team_names[n].find_element(By.XPATH,'..')
                     ft_score = self.browser.execute_script(
                 "return arguments[0].nextElementSibling.nextElementSibling;", parent_element)
-                    games_selected[name.text]['ft_score']=ft_score.text
-            output=confirm_outcome(games_selected_results=games_selected,games_played=len(games_selected))
-            result=output[0]
-            total_odds=output[1]
-            potential_win=round(total_odds*50,2)
-            games_selected['possible_win']=potential_win
-            print(games_selected)
-            if result=="WON":
-                result={"outcome":result,"subject":f"You WON ₦{potential_win} this week","message":f"Betslip: {games_selected}"}
-            else:
-                result={"outcome":result,"subject":"You LOST this week.","message":f"Betslip: {games_selected}"}
+                    games_selected[current_match]['ft_score']=ft_score.text
         except Exception as error:
             print(f"an error occured when checking last result i want to use acc balance to check.This is the error: {error}")
-            # if the result page fails, compare balances to tell the outcome
-            if check_if_last_stake_has_played(browser=self.browser,week_to_check=latest_week,time_delay=30):
-                time.sleep(10)  # TODO: Confirm the time to sleep before the balance reflects
-                print("last staked has finnished playing")
-                refresh_bal_button=self.browser.find_element(By.CSS_SELECTOR, '.user-balance-container .refresh-icon')
-                refresh_bal_button.click()
-                time.sleep(2)
-                acc_balance_2=self.browser.find_element(By.CSS_SELECTOR, '.user-balance-container .amount').text
-                print(f"Old acc bal {acc_balance}, New acc bal {acc_balance_2}")
-                if float(acc_balance_2.replace(",","_"))>float(acc_balance.replace(',','_')):
-                    result={"outcome":'WON',"subject":"You WON this week.","message":f"I used the acc bal to confirm ticket won. this is the error:\n{error}"}
-                else:
-                    result={"outcome":'LOST',"subject":"You LOST this week.","message":f"I used the acc bal to confirm ticket won. this is the error:\n{error}"}
-
+            
         
         finally:
-            print(result["subject"])
-            if result['outcome']=="WON":
-                send_email(Email=os.environ.get("EMAIL_USERNAME"),
-                        Password=os.environ.get("EMAIL_PASSWORD"),
-                        Subject=result["subject"],
-                        Message=result["message"]
-                        )
+            # print(games_selected)
+            # send_email(Email=os.environ.get("EMAIL_USERNAME"),
+            #         Password=os.environ.get("EMAIL_PASSWORD"),
+            #         Subject="RESULT",
+            #         Message=games_selected,
+            #         )
             cancel_result_page_button = self.browser.find_element(By.CSS_SELECTOR, "svg path")
             cancel_result_page_button.click()
 
-        return [result,potential_win]
+        return games_selected
 
 
 
@@ -142,32 +120,23 @@ class PlayGame:
 
 
     def select_games_to_play(self):
-        week_to_select = self.browser.find_elements(By.CSS_SELECTOR, '.week')[0]
-        available_odds=self.browser.find_elements(By.CSS_SELECTOR, '[data-testid="match-odd-value"]')[:27]
-        element_list=game_selection_algorithm(available_odds)
+        last_available_week = self.browser.find_elements(By.CSS_SELECTOR, '.week')[3]
+        available_odds=self.browser.find_elements(By.CSS_SELECTOR, '[data-testid="match-odd-value"]')
+        week_1_odds=available_odds[:27]
+        week_2_odds=available_odds[27:54]
+        week_3_odds=available_odds[54:81]
+        week_4_odds=available_odds[81:108]
+        available_week_odds=[week_1_odds,week_2_odds,week_3_odds,week_4_odds]
+        element_list=game_selection_algorithm(available_week_odds)
         selected_games={}
         for element in element_list:
-            direct_parent_element=element.find_element(By.XPATH,'..')
-            sibling = self.browser.execute_script("return arguments[0].previousElementSibling;", direct_parent_element)
-            if sibling==None:
-                selected_stake="over_2.5"
-            else:
-                selected_stake="under_2.5"
-                
-            # To click the selected element
-            try:
-                element.click()
-            except ElementClickInterceptedException:
-                self.browser.execute_script(f"window.scrollTo(0, {element.location['y']-200});")
-                time.sleep(0.5)
-                element.click()
-
             parent_element=element.find_element(By.XPATH,'../../../../..')
             teams = self.browser.execute_script(
                 "return arguments[0].previousElementSibling;", parent_element)
             home_team_name=teams.find_element(By.CSS_SELECTOR, '[data-testid="match-home-team"]').text
-            selected_games[home_team_name]={"selected_stake":selected_stake,"odd":float(element.text)}
-        return {'week_selected':week_to_select.text,"selected_games":selected_games}
+            away_team_name=teams.find_element(By.CSS_SELECTOR, '[data-testid="away-home-team"]').text
+            selected_games[f"{home_team_name} - {away_team_name}"]={"odds":float(element.text)}
+        return {'last_available_week':last_available_week.text,"selected_games":selected_games}
 
 
     def place_the_bet(self, amount: int, test: bool)->str:

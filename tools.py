@@ -32,7 +32,7 @@ def set_up_driver_instance():
     chrome_options.add_experimental_option('useAutomationExtension', False)
 
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     chrome_options.add_argument('--log-level=3') # to stop printing error messages to the console 
     chrome_options.add_argument("start-maximized") # chrome_options.add_argument('--window-size=1920,1080')
     chrome_options.add_argument("--disable-gpu")
@@ -85,7 +85,7 @@ def delete_cache(driver):
     driver.delete_all_cookies()
     # time.sleep(2)
     driver.get('chrome://settings/clearBrowserData')  # Open your chrome settings.
-    # time.sleep(1)
+    time.sleep(1)
     actions = ActionChains(driver) 
     actions.send_keys(Keys.TAB * 2 + Keys.DOWN * 4 + Keys.TAB * 7 + Keys.ENTER) # Google Chrome 
     # actions.send_keys(Keys.TAB * 2 + Keys.DOWN * 4 + Keys.TAB * 9 + Keys.ENTER) # Microsoft Edge  
@@ -136,57 +136,26 @@ def cancel_popup(browser):
     cancel_body.click()
 
 
-def game_selection_algorithm(available_odds)->list: 
-    draw=100
-    selected_home=None
-    selected_draw=None
-    selected_away=None
-    n=0
-    for _ in range(int(len(available_odds)/3)):
-        current_row=available_odds[n:n+3]
-        home=current_row[0]
-        x=current_row[1]
-        away=current_row[2]
-        odd=abs(float(home.text)-float(away.text))
-        if odd<draw:
-            draw,selected_draw=odd,x
-            selected_home,selected_away=home.text,away.text
-        n+=3
-    element_list=[selected_draw]
-    print(selected_home, selected_draw.text ,selected_away)
-    print(element_list[0].text,draw)
+def game_selection_algorithm(available_week_odds)->list: 
+    element_list=[]
+    for available_odds in available_week_odds:
+        draw=100
+        selected_home=None
+        selected_draw=None
+        selected_away=None
+        n=0
+        for _ in range(int(len(available_odds)/3)):
+            current_row=available_odds[n:n+3]
+            home=current_row[0]
+            x=current_row[1]
+            away=current_row[2]
+            odd=abs(float(home.text)-float(away.text))
+            if odd<draw:
+                draw,selected_draw=odd,x
+                selected_home,selected_away=home.text,away.text
+            n+=3
+        element_list.append(selected_draw)
     return element_list
-
-# def game_selection_algorithm(available_odds)->list: 
-#     element_list=[available_odds[1]]
-#     return element_list
-
-# def game_selection_algorithm(available_odds)->list:
-#     # length=len(available_odds)
-#     # lst=[]
-#     # for odd in available_odds:
-#     #     lst.append(odd.text)
-#     # print(lst) 
-
-#     first=100
-#     first_element=None
-#     second=100
-#     second_element=None
-#     for element in available_odds:
-#         odd=float(element.text)
-#         if odd<first:
-#             if first<=second:
-#                 second=first
-#                 second_element=first_element
-#             first,first_element=odd,element
-#         elif odd<second:
-#             if second<=first:
-#                 first=second
-#                 first_element=second_element
-#             second,second_element=odd,element
-            
-#     element_list=[first_element,second_element]
-#     return element_list
 
 
 def clear_bet_slip(browser):
