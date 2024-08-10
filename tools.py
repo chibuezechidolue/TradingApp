@@ -16,7 +16,7 @@ import datetime
 import threading
 import os,psutil
 
-
+load_dotenv()
 
 def set_up_driver_instance():
     """ To create and return a webdriver object with disabled gpu and headless"""
@@ -32,7 +32,7 @@ def set_up_driver_instance():
     chrome_options.add_experimental_option('useAutomationExtension', False)
 
     chrome_options.add_argument("--no-sandbox")
-    # chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument('--log-level=3') # to stop printing error messages to the console 
     chrome_options.add_argument("start-maximized") # chrome_options.add_argument('--window-size=1920,1080')
     chrome_options.add_argument("--disable-gpu")
@@ -106,8 +106,10 @@ def terminate_driver_process(browser):
         browser.quit()
         for process in child_processes:
             if process.is_running():
-                os.system(f"taskkill /F /PID {process.pid}")        #Window OS
-                # os.system(f"kill {process.pid}")                  #Linux OS
+                if os.environ.get("OPERATING_SYSTEM")=="windows":
+                    os.system(f"taskkill /F /PID {process.pid}")        #Window OS
+                elif os.environ.get("OPERATING_SYSTEM")=="linux":
+                    os.system(f"kill {process.pid}")                  #Linux OS
 
 
 
@@ -152,9 +154,9 @@ def game_selection_algorithm(available_week_odds)->list:
             odd=abs(float(home.text)-float(away.text))
             if odd<draw:
                 draw,selected_draw=odd,x
-                selected_home,selected_away=home.text,away.text
+                selected_home,selected_away=home,away
             n+=3
-        element_list.append(selected_draw)
+        element_list.append([selected_home,selected_draw,selected_away])
     return element_list
 
 
