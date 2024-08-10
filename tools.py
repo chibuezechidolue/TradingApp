@@ -115,7 +115,7 @@ def terminate_driver_process(browser):
 
         # os.system(f"taskkill /f /t /im {process_name}")   # Windows OS: to kill all process with the given process_name 
         
-        # os.system(f"kilall {process_name}")   # Linux OS: to kill all process with the given process_name 
+        # os.system(f"killall {process_name}")   # Linux OS: to kill all process with the given process_name 
 
                             # OR
 

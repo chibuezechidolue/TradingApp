@@ -110,7 +110,7 @@ if __name__=="__main__":
         if os.environ.get("OPERATING_SYSTEM")=="windows":
             os.system(f"taskkill /f /t /im chrome.exe")  # Windows OS: to kill all process with the given process_name 
         elif os.environ.get("OPERATING_SYSTEM")=="linux":
-            os.system(f"kilall chrome")   # Linux OS: to kill all process with the given process_name
+            os.system(f"killall chrome")   # Linux OS: to kill all process with the given process_name
         play_bot()
         # bot=mp.Process(target=play_bot,daemon=True)
         bot=MyCustomThread(target=play_bot,daemon=True)
