@@ -89,7 +89,7 @@ def play_bot():
                 # del game_result[k]
                 pass
 
-        pattern_list=["1 - 0","0 - 1","1 - 1","2 - 1","1 - 2","2 - 2"]
+        pattern_list=["0 - 0","1 - 1","2 - 2","1 - 0","0 - 1","2 - 1","1 - 2"]
         pattern_scores={}
         for score in pattern_list:
             pattern_scores[score]=summarized_result.get(score)
@@ -102,7 +102,11 @@ def play_bot():
                     )
     except Exception as error:
         print(f"An error occured this SEASON. The Error: {error}")
-        pass
+        send_email(Email=os.environ.get("EMAIL_USERNAME"),
+                Password=os.environ.get("EMAIL_PASSWORD"),
+                Subject="Error Ocurred",
+                Message=f"An error occured this SEASON. The Error: {error}")
+                
     
 
 if __name__=="__main__":
