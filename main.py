@@ -76,14 +76,21 @@ def play_bot():
             print(f"i am waiting for {time_to_sleep}secs")
             time.sleep(time_to_sleep)
 
-        summarized_result={}
+        ft_summarized_result={}
+        ht_summarized_result={}
         for k,v in game_result.items():
             try:
-                current_score=v["ft_score"]
-                if summarized_result.get(current_score)!=None:
-                    summarized_result[current_score]+=1
+                current_ft_score=v["ft_score"]
+                if ft_summarized_result.get(current_ft_score)!=None:
+                    ft_summarized_result[current_ft_score]+=1
                 else:
-                    summarized_result[current_score]=1
+                    ft_summarized_result[current_ft_score]=1
+                
+                current_ht_score=v["ht_score"]
+                if ht_summarized_result.get(current_ht_score)!=None:
+                    ht_summarized_result[current_ht_score]+=1
+                else:
+                    ht_summarized_result[current_ht_score]=1
             except KeyError:
                 # game_result.pop(k)
                 # del game_result[k]
@@ -92,13 +99,13 @@ def play_bot():
         pattern_list=["0 - 0","1 - 1","2 - 2","1 - 0","0 - 1","2 - 1","1 - 2"]
         pattern_scores={}
         for score in pattern_list:
-            pattern_scores[score]=summarized_result.get(score)
-        print(f"Summarized Result: {summarized_result}")
+            pattern_scores[score]=ft_summarized_result.get(score)
+        print(f"Summarized Result: {ft_summarized_result}")
         print(f"PATTERN SCORES: {pattern_scores}")
         send_email(Email=os.environ.get("EMAIL_USERNAME"),
                     Password=os.environ.get("EMAIL_PASSWORD"),
                     Subject="SEASON FINISHED",
-                    Message=f"PATTERN SCORES: {pattern_scores}\nSummarized Result: {summarized_result}\nFull Result: {game_result}"
+                    Message=f"PATTERN SCORES: {pattern_scores}\nSummarized Result(ft): {ft_summarized_result}\nSummarized Result(ht): {ht_summarized_result}\nFull Result: {game_result}"
                     )
     except Exception as error:
         print(f"An error occured this SEASON. The Error: {error}")
