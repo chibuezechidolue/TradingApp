@@ -126,6 +126,7 @@ class CheckPattern:
                 time.sleep(5)
             
                 game_weeks = self.browser.find_elements(By.CSS_SELECTOR, ".week-number")
+                print(game_weeks[0].text)
                 # checking if the last week played is latest_week before going ahead to save the page
                 game_weeks = check_if_last_result_equal_input(self.browser, game_weeks=game_weeks,
                                                             week_to_check=latest_week,time_delay=30)
@@ -140,8 +141,11 @@ class CheckPattern:
                     current_match=f"{home_team_names[n].text} - {away_team_names[n].text}"
                     if games_selected.get(current_match)!=None:
                         parent_element=home_team_names[n].find_element(By.XPATH,'..')
+                        ht_score = self.browser.execute_script(
+                            "return arguments[0].nextElementSibling;", parent_element)
                         ft_score = self.browser.execute_script(
-                    "return arguments[0].nextElementSibling.nextElementSibling;", parent_element)
+                            "return arguments[0].nextElementSibling.nextElementSibling;", parent_element)
+                        games_selected[current_match]['ht_score']=ht_score.text
                         games_selected[current_match]['ft_score']=ft_score.text
             except Exception as error:
                 print(f"an error occured when checking last result i want to use acc balance to check.This is the error: {error}")
