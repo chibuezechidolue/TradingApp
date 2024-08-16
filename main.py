@@ -54,9 +54,9 @@ def play_bot():
                 else:
                     play_length=4
 
-                print(f"this is game_result: {game_result}")
+                # print(f"this is game_result: {game_result}")
             else:
-                # browser=pattern.check_result(length="new season")
+                browser=pattern.check_result(length="new season")
                 play_length=4
             game_play=PlayGame(driver=browser,market="o/u 2.5")
             output=game_play.select_games_to_play(length=play_length)
