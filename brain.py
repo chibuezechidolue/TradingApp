@@ -126,7 +126,9 @@ class CheckPattern:
                 time.sleep(5)
             
                 game_weeks = self.browser.find_elements(By.CSS_SELECTOR, ".week-number")
-                print(game_weeks[0].text)
+                # print(game_weeks[0].text)
+                current_league=self.browser.find_element(By.CSS_SELECTOR, '[data-testid="results-header-league"]')
+                print(current_league.text)
                 # checking if the last week played is latest_week before going ahead to save the page
                 game_weeks = check_if_last_result_equal_input(self.browser, game_weeks=game_weeks,
                                                             week_to_check=latest_week,time_delay=30)

@@ -134,7 +134,6 @@ for msg in msgs:
                             # if ft_score == "0 - 1" or ft_score == "1 - 1":
                             # if int(ft_score[0])>int(ft_score[4]):
                                 draw_count+=1
-                                print("Yessssssss")
                                 # print(k,v["ft_score"])
                     if draw_count>0:
                         is_draw=True
