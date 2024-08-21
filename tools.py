@@ -14,7 +14,7 @@ import time
 import pygsheets 
 import datetime
 import threading
-import os,psutil
+import os,psutil,math
 
 
 
@@ -32,7 +32,7 @@ def set_up_driver_instance():
     chrome_options.add_experimental_option('useAutomationExtension', False)
 
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--headless")
+    # chrome_options.add_argument("--headless")
     chrome_options.add_argument('--log-level=3') # to stop printing error messages to the console 
     chrome_options.add_argument("start-maximized") # chrome_options.add_argument('--window-size=1920,1080')
     chrome_options.add_argument("--disable-gpu")
@@ -142,7 +142,7 @@ def game_selection_algorithm(available_odds)->list:
     selected_draw=None
     selected_away=None
     n=0
-    for _ in range(int(len(available_odds)/3)):
+    for i in range(int(len(available_odds)/3)):
         current_row=available_odds[n:n+3]
         home=current_row[0]
         x=current_row[1]
@@ -151,10 +151,10 @@ def game_selection_algorithm(available_odds)->list:
         if odd<draw:
             draw,selected_draw=odd,x
             selected_home,selected_away=home.text,away.text
+            num=i
+
         n+=3
-    element_list=[selected_draw]
-    print(selected_home, selected_draw.text ,selected_away)
-    print(element_list[0].text,draw)
+    element_list=[selected_draw,num]
     return element_list
 
 # def game_selection_algorithm(available_odds)->list: 
@@ -315,7 +315,7 @@ def check_if_last_result_equal_input(browser:object,game_weeks:list,week_to_chec
             if game_weeks!=[]:
                 break
             reload_result_page(browser)
-            time.sleep(2)
+            time.sleep(3)
         last_result_week=game_weeks[0].text
     print(last_result_week,week_to_check)
     return game_weeks
@@ -361,16 +361,38 @@ def confirm_outcome(games_selected_results:dict,games_played:int):
     total_odds=1
     for k,v in games_selected_results.items():
         ft_score=v['ft_score']
-        ft_home_score=int(ft_score[0])
-        ft_away_score=int(ft_score[4])
-        total_goals=ft_away_score+ft_home_score
-        total_odds*=v["odd"]
-        if ft_home_score==ft_away_score:
-            result='WON'
+        ht_score=v["ht_score"]
+        result=check_ht_ft(ft_score=ft_score,ht_score=ht_score)
+        if result=="2/X":
+            status='WON'
         else:
-            result="LOST"
+            status="LOST"
 
-    return [result,round(total_odds,2)]
+    return status
+
+def check_ht_ft(ht_score,ft_score):
+    ht_home=int(ht_score[0])
+    ht_away=int(ht_score[4])
+    ft_home=int(ft_score[0])
+    ft_away=int(ft_score[4])
+    result=None
+    
+    if ft_home==ft_away and (ht_home>ht_away or ht_home<ht_away):
+        result="2/X"
+    elif ht_home==ht_away and (ft_home>ft_away or ft_home<ft_away):
+        result="X/2"
+    elif ht_home==ht_away and ft_home==ft_away:
+        result="X/X"
+    
+    return result
+
+def calc_stake_amount(amount:float,odd:float,base:int)->float:
+    expected_sum=amount*base
+    possible_stake=math.ceil(expected_sum/odd)
+    if possible_stake<50:
+        possible_stake=50
+    return possible_stake
+    
 
 
 class MyCustomThread(threading.Thread):
