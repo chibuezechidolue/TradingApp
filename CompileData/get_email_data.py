@@ -63,12 +63,25 @@ def check_ht_ft(ht_score,ft_score):
     ft_away=int(ft_score[4])
     result=None
     
-    if ft_home==ft_away and (ht_home>ht_away or ht_home<ht_away):
-        result="2/X"
-    # elif ht_home==ht_away and (ft_home>ft_away or ft_home<ft_away):
+    # if ft_home==ft_away and (ht_home>ht_away or ht_home<ht_away):
+    #     result="2/X"
+    # if ht_home==ht_away and (ft_home>ft_away or ft_home<ft_away):
     #     result="X/2"
-    # elif ht_home==ht_away and ft_home==ft_away:
+    # if ht_home==ht_away and ft_home==ft_away:
     #     result="X/X"
+    # if ft_home==ft_away:
+    #     result="X"
+    # if ht_home==ht_away:
+    #     result="X"
+    # if ht_home==ht_away and ft_home>ft_away:
+    #     result="X/1"
+
+    # if ht_home==ht_away and ft_home<ft_away:
+    #     result="X/2"
+    # if ft_home==ft_away and ht_home<ht_away:
+    #     result="2/X"
+    if (ht_home<ht_away and ft_home>ft_away) or (ht_home>ht_away and ft_home<ft_away) :
+        result="2/X"
     
     return result
 
@@ -142,7 +155,7 @@ def check_content(content,type:str):
                     length+=1
                     ht_score=v.get("ht_score")
                     ft_score=v.get("ft_score")
-                    # if int(ht_score[0])==int(ht_score[4]):
+                    if int(ht_score[0])>0 and int(ht_score[4])>0:
                     # if score_odds.get(ht_score)!=None:
                     #     if score_odds.get(ht_score)<6: 
                     #         profit+=score_odds.get(ht_score)*20
@@ -152,23 +165,24 @@ def check_content(content,type:str):
                     # else:
                     #     profit-=80
                         # print(f"You LOST: {80}")
-                    # if ht_score == "1 - 0":
-                    # if ht_score == "2 - 0" or ht_score == "0 - 2":
-                    # if ft_score == "2 - 0" or ft_score == "0 - 2":
+                    # if ht_score == "0 - 0":
+                    # if ht_score == "1 - 0" or ht_score == "0 - 1":
+                    # if ft_score == "1 - 1" or ft_score == "2 - 2" or ft_score == "3 - 3" :
                     # if (int(ht_score[0])>int(ht_score[4]) and int(ft_score[0])<int(ft_score[4])) or (int(ht_score[0])<int(ht_score[4]) and int(ft_score[0])>int(ft_score[4])):
                         # profit+=score_odds.get(ht_score)*score_list[length-1]
                         # draw_count+=1
                         # break
-                    result=check_ht_ft(ht_score=ht_score,ft_score=ft_score)
-                    if result != None:
-                        profit+=9*score_list[length-1]
+                    # result=check_ht_ft(ht_score=ht_score,ft_score=ft_score)
+                    # if result != None:
+                    # if result != None:
+                    #     profit+=9*score_list[length-1]
                         draw_count+=1
                         # print(ht_score,ft_score,result)
                         # print(9,score_list[length-1])
                         break
                     
                     
-                # if length==8:
+                # if length==9:
                 #     break
             # print(profit - sum(score_list[:length])*3)
 
