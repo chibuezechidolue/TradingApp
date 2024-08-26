@@ -57,7 +57,7 @@ class CheckPattern:
                     result_button.click()
             except:
                 self.browser.get("https://m.betking.com/virtual/league/kings-bundliga/results")
-            time.sleep(5)
+            time.sleep(10)
 
             game_weeks = self.browser.find_elements(By.CSS_SELECTOR, ".week-number")
             if game_weeks==[]:
@@ -78,7 +78,7 @@ class CheckPattern:
                 self.browser = set_up_driver_instance()   # driver instance without User Interface (--headless)
                 time.sleep(1)
                 self.browser.get("https://m.betking.com/virtual/league/kings-bundliga/results")
-                time.sleep(3)
+                time.sleep(10)
 
             elif current_game_week>week_to_check:
                 time_to_sleep=(34-current_game_week)*3
@@ -92,7 +92,7 @@ class CheckPattern:
                 self.browser = set_up_driver_instance()   # driver instance without User Interface (--headless)
                 time.sleep(1)
                 self.browser.get("https://m.betking.com/virtual/league/kings-bundliga/results")
-                time.sleep(3)
+                time.sleep(10)
 
             game_weeks = self.browser.find_elements(By.CSS_SELECTOR, ".week-number")
             game_weeks = check_if_last_result_equal_input(self.browser, game_weeks=game_weeks,
@@ -123,7 +123,7 @@ class CheckPattern:
                         result_button.click()
                 except:
                     self.browser.get("https://m.betking.com/virtual/league/kings-bundliga/results")
-                time.sleep(5)
+                time.sleep(10)
             
                 game_weeks = self.browser.find_elements(By.CSS_SELECTOR, ".week-number")
                 # print(game_weeks[0].text)

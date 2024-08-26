@@ -276,13 +276,13 @@ def check_if_last_result_equal_input(browser:object,game_weeks:list,week_to_chec
         #print(last_result_week,week_to_check)
         time.sleep(time_delay)
         reload_result_page(browser)
-        time.sleep(2)
+        time.sleep(10)
         for _ in range(3):
             game_weeks[:]=browser.find_elements(By.CSS_SELECTOR,".week-number")
             if game_weeks!=[]:
                 break
             reload_result_page(browser)
-            time.sleep(2)
+            time.sleep(10)
         last_result_week=game_weeks[0].text
     print(last_result_week,week_to_check)
     return game_weeks
