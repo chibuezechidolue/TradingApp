@@ -1,60 +1,11 @@
 from dotenv import load_dotenv
-import imaplib, email, os
-import datetime
+from compiling_tools import (print_both,get_emails,search)
+
+import imaplib, os
 
 load_dotenv()
  
 
-# Function to get email content part i.e its body part
-def get_body(msg):
-    if msg.is_multipart():
-        return get_body(msg.get_payload(0))
-    else:
-        return msg.get_payload(None, True)
- 
-# Function to search for a key value pair 
-def search(key, value, con):
-    # using only SINCE or BEFORE to filter 
-    result, data = con.search(None, key, '"{}"'.format(value))
-    # using both SINCE and BEFORE to filter
-    # result, data = con.search(None,'(SINCE "24-Jun-2024" BEFORE "26-Jun-2024")' )
-    
-    # result, data = con.search(None,'(SINCE "17-Apr-2024"  )' )
-    # result, data = con.search(None,f'(SINCE {SINCE_DATE}  )' )
-    # result, data = con.search(None,"ALL" )  #not sure about the all
-
-
-    return data
- 
-# Function to get the list of emails under this label
-def get_emails(result_bytes):
-    msgs = [] # all the email data are pushed inside an array
-    count=0
-    for num in result_bytes[0].split():
-        typ, data = con.fetch(num, '(RFC822)')
-
-        # create a dictionary so as to sort with date since gmail does not support con.sort()
-        msg_object={}
-        msg_object_copy={}
-        msg=email.message_from_bytes(data[0][1])
-        msg_date=""
-        for val in msg['Date'].split(' '):
-            if(len(val)==1):
-                val="0"+val
-            # to pad the single date with 0
-            msg_date=msg_date+val+" "
-        msg_date=msg_date[:25]
-        msg_object['date']= datetime.datetime.strptime(msg_date,"%a, %d %b %Y %H:%M:%S")
-    # to convert string to date time object for sorting the list
-        msg_object['msg']=msg
-        msg_object_copy=msg_object.copy()
-        msgs.append(msg_object_copy)
-        # count+=1
-        # if count==16:
-        #     break
-    # msgs.sort(reverse=True,key=lambda r:r['date'])
-    msgs.sort(reverse=False,key=lambda r:r['date'])
-    return msgs
 
 def check_ht_ft(ht_score,ft_score):
     ht_home=int(ht_score[0])
@@ -148,14 +99,14 @@ def check_content(content,type:str):
                         # print(f"You LOST: {80}")
                     # if ht_score == "0 - 0":
                     # if ht_score == "2 - 1" or ht_score == "1 - 2":
-                    # if ft_score == "1 - 1" or ft_score == "2 - 2" or ft_score == "3 - 3" :
+                    if ft_score == "1 - 2" or ft_score == "2 - 1"  :
                     # if (int(ht_score[0])>int(ht_score[4]) and int(ft_score[0])<int(ft_score[4])) or (int(ht_score[0])<int(ht_score[4]) and int(ft_score[0])>int(ft_score[4])):
                         # profit+=score_odds.get(ht_score)*score_list[length-1]
                         # draw_count+=1
                         # break
-                    result=check_ht_ft(ht_score=ht_score,ft_score=ft_score)
+                    # result=check_ht_ft(ht_score=ht_score,ft_score=ft_score)
                     # if result != None:
-                    if result != None:
+                    # if result != None:
                     #     profit+=9*score_list[length-1]
                         draw_count+=1
                         # print(ht_score,ft_score,result)
@@ -181,8 +132,8 @@ def check_content(content,type:str):
 #  Sat, 10 Aug 2024 17:18:23
 
 
-SINCE_DATE="10-Aug-2024"           # SINCE_DATE="14-Jun-2024        
-EXCLUDE_DATE="09 Aug 2024"         # EXCLUDE_DATE="13 Jun 2024""
+SINCE_DATE="1-Sep-2024"           # SINCE_DATE="14-Jun-2024        
+EXCLUDE_DATE="18 Aug 2024"         # EXCLUDE_DATE="13 Jun 2024""
 imap_url = 'imap.gmail.com'
 
 # this is done to make SSL connection with GMAIL
@@ -198,7 +149,7 @@ print(result)
  # fetching emails from this user "tu**h*****1@gmail.com"
 # msgs = get_emails(search('FROM', os.environ.get("EMAIL_USERNAME"), con))
 
-msgs = get_emails(search('SINCE', SINCE_DATE, con))
+msgs = get_emails(con,search('SINCE', SINCE_DATE, con))
 print(len(msgs))
 
 # for since and before option
