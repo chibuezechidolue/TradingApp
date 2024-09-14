@@ -36,7 +36,8 @@ def check_ht_ft(ht_score,ft_score):
     
     return result
 
-
+cur_none_values={'0 - 0': 0, '1 - 1': 0, '2 - 2': 0, '1 - 0': 0, '0 - 1': 0, '2 - 1':0, 
+                             '1 - 2': 0}
 def check_content(content,type:str):
     if type=="ft":
         try:
@@ -68,6 +69,33 @@ def check_content(content,type:str):
         except Exception as error:
             print(f"an error occured. this is the error {error}")
             pass
+    elif type=="pattern":
+        try:
+            # print(content)
+            try:
+                t=content.split("PATTERN SCORES: ")
+                t=t[1].split("Summarized Result(ft): ")
+                current_result=eval(t[0])
+            except:
+                # print(content)
+                t=content.split("PATTERN SCORES: ")
+                t=t[1].split("Summarized Result: ")
+                current_result=eval(t[0])
+            
+            # print(current_result)
+            
+            global cur_none_values
+            for k,v in current_result.items():
+                if v==None :
+                    cur_none_values[k]+=1
+                elif k not in list(cur_none_values.keys()):
+                    cur_none_values[k]+=1
+                else:
+                    cur_none_values[k]=0
+            print(cur_none_values)
+
+        except Exception as error:
+            print(f"An error occured, Error: {error}")
     elif type=="ht":
         try:
             t=content.split("Full Result: ")
@@ -82,8 +110,8 @@ def check_content(content,type:str):
             # score_list=[25,25,25,25,25,25,50,50,50,75,75,75]
             profit=0
             for k,v in current_result.items():
-                # if v['avg_diff']==0.020000000000000018:
-                if v['avg_diff']:
+                if v['avg_diff']==0.020000000000000018:
+                # if v['avg_diff']:
                     length+=1
                     ht_score=v.get("ht_score")
                     ft_score=v.get("ft_score")
@@ -99,13 +127,14 @@ def check_content(content,type:str):
                         # print(f"You LOST: {80}")
                     # if ht_score == "0 - 0":
                     # if ht_score == "2 - 1" or ht_score == "1 - 2":
-                    if ft_score == "1 - 2" or ft_score == "2 - 1"  :
+                    # if ft_score == "1 - 2" or ft_score == "2 - 1"  :
+                    # if (int(ht_score[0])==int(ht_score[4]) and int(ft_score[0])==int(ft_score[4])):
                     # if (int(ht_score[0])>int(ht_score[4]) and int(ft_score[0])<int(ft_score[4])) or (int(ht_score[0])<int(ht_score[4]) and int(ft_score[0])>int(ft_score[4])):
                         # profit+=score_odds.get(ht_score)*score_list[length-1]
                         # draw_count+=1
                         # break
-                    # result=check_ht_ft(ht_score=ht_score,ft_score=ft_score)
-                    # if result != None:
+                    result=check_ht_ft(ht_score=ht_score,ft_score=ft_score)
+                    if result != None:
                     # if result != None:
                     #     profit+=9*score_list[length-1]
                         draw_count+=1
@@ -132,7 +161,7 @@ def check_content(content,type:str):
 #  Sat, 10 Aug 2024 17:18:23
 
 
-SINCE_DATE="1-Sep-2024"           # SINCE_DATE="14-Jun-2024        
+SINCE_DATE="11-Aug-2024"           # SINCE_DATE="14-Jun-2024        
 EXCLUDE_DATE="18 Aug 2024"         # EXCLUDE_DATE="13 Jun 2024""
 imap_url = 'imap.gmail.com'
 
@@ -171,4 +200,5 @@ for msg in msgs:
 
                 # check_content(content=content,type="ft")
                 check_content(content=content,type="ht")
+                # check_content(content=content,type="pattern")
 

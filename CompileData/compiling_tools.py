@@ -1,3 +1,4 @@
+from itertools import count
 import sys,os
 # inorder to use absolute path in importing  set_up_driver_instance
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -12,7 +13,7 @@ from selenium.webdriver.common.by import By
 
 def print_both(*args):
     """To print on the terminal as well as an output file"""
-    with open('output.txt','at') as file:
+    with open('read_output.txt','at') as file:
         to_print = ' '.join([str(arg) for arg in args])
         print(to_print)
         print(to_print, file=file)
@@ -57,19 +58,37 @@ def get_emails(con,result_bytes):
             # to pad the single date with 0
             msg_date=msg_date+val+" "
         msg_date=msg_date[:-13]
-        msg_object['date']= datetime.datetime.strptime(msg_date,"%a, %d %b %Y %H:%M:%S")
+        try:
+            msg_object['date']= datetime.datetime.strptime(msg_date,"%a, %d %b %Y %H:%M:%S")
+        except:
+            msg_object['date']=datetime.datetime.now()
     # to convert string to date time object for sorting the list
         msg_object['msg']=msg
         msg_object_copy=msg_object.copy()
         msgs.append(msg_object_copy)
         count+=1
-        if count==10:
+        if count==200:
             break
     # msgs.sort(reverse=True,key=lambda r:r['date'])
     msgs.sort(reverse=False,key=lambda r:r['date'])
     return msgs
 
+def check_ht_ft(ht_score,ft_score):
+    count=0
+    for n in range(len(ht_score)):
+        ht_home=int(ht_score[n][0])
+        ht_away=int(ht_score[n][4])
+        ft_home=int(ft_score[n][0])
+        ft_away=int(ft_score[n][4])
+        result=None
+        
+        # if ft_home==ft_away and (ht_home>ht_away or ht_home<ht_away):
+        #     result="2/X"
+        if ht_home==ht_away:
+            count+=1
+        
 
+    return count
 
 def check_result(ft_scores:list,ht_scores:list,curr_profit:int,curr_sec:int,counts:list,curr_stake,week_ref:list,market:str):
     count=counts[0]
